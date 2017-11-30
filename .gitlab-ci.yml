@@ -50,3 +50,19 @@ helm_publish_tag:
     - /v[0-9]+\.[0-9]+(\.[0-9]+[a-z]?)?/
   script:
     - cd ${CHART_NAME} && helm registry push ${REGISTRY}/${REGISTRY_USER}/${CHART_NAME} -c stable
+
+# deploy-staging:
+#   stage: deploy
+#   only:
+#     - /v[0-9]+\.[0-9]+\.[0-9]+-[0-9]+/
+#   variables:
+#     CHART_REGISTRY_CHANNEL: prod
+#     NAMESPACE: ${APP_NAME}-staging
+#   before_script:
+#   - mkdir /root/.kube
+#   - echo ${STAGING_KUBECONFIG} | base64 -d > /root/.kube/config
+#   - helm init --client-only
+#   script:
+#   - cd ${APP_NAME}
+#   - export HELM_OPTS="--install --namespace ${NAMESPACE} --set victorops.apiKey=$STAGING_VICTOROPS_API_KEY"
+#   - helm registry upgrade ${CHART_REGISTRY_URI}:${CHART_REGISTRY_CHANNEL} -- ${NAMESPACE} ${HELM_OPTS}
