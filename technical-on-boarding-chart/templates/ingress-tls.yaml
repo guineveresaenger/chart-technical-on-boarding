@@ -17,5 +17,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: technical-on-boarding
+          serviceName: {{.Values.name}}
           servicePort: 80
