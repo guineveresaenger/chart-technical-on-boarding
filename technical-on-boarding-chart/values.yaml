@@ -4,6 +4,10 @@
 # name: value
 
 name: technical-on-boarding
-namespace: technical-on-boarding
 image: quay.io/samsung_cnct/technical-on-boarding:1.1.0
 host: technical-on-boarding.kubeme.io
+onboard:
+  org: samsung-cnct
+  repo: technical-on-boarding #home for new issues created
+  clientId:
+  clientSecret:
