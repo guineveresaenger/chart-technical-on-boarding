@@ -1,22 +1,5 @@
 # Chart for Technical On-boarding
 
-## Chart Details
-
-This chart will do the following:
-
-* create a docker config secret for private image repo access if enabled (`image.pullSecretEnabled=true`)
-* create a secret for VictorOps credentials
-* create a deployment of cyklops-events that listens on port 8000
-
-## Installing the Chart
-
-To install the chart with the release name `my-release`:
-
-```bash
-$ build/build.sh
-$ helm install --name my-release cyklops-events/
-```
-
 ## Configuration
 
 The following tables lists the configurable parameters of the Technical On-boarding chart and their default values.
