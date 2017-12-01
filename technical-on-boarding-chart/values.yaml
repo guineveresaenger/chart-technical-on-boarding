@@ -9,5 +9,5 @@ host: technical-on-boarding.kubeme.io
 onboard:
   org: samsung-cnct
   repo: technical-on-boarding #home for new issues created
-  clientId:
-  clientSecret:
+  clientId: REPLACE
+  clientSecret: REPLACE 
