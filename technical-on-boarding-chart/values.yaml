@@ -5,9 +5,10 @@
 
 name: technical-on-boarding
 image: quay.io/samsung_cnct/container-technical-on-boarding
+tag: latest
 host: technical-on-boarding.kubeme.io
 onboard:
   org: samsung-cnct
   repo: technical-on-boarding #home for new issues created
   clientId: REPLACE
-  clientSecret: REPLACE 
+  clientSecret: REPLACE
