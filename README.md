@@ -7,6 +7,7 @@ The following tables lists the configurable parameters of the Technical On-board
 | Parameter                | Description                                     | Default                                                |
 | ------------------------ | ----------------------------------------------- | ------------------------------------------------------ |
 | `image           `       | FQDN repository/image name                      | `quay.io/samsung_cnct/technical-on-boarding-container` |
+| `tag`                    | image tag                                       | latest                                                 |
 | `onboard.org`            | organization                                    | ` samsung-cnct`                                        |
 | `onboard.repo`           | repo where new issues will be created           | `technical-on-boarding`                                |
 | `onboard.clientId`       | github client id                                |  **Required**                                          |
