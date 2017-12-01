@@ -1,5 +1,5 @@
 # Chart for Technical On-boarding
-
+[![pipeline status](https://git.cnct.io/common-tools/samsung-cnct_chart-technical-on-boarding/badges/master/pipeline.svg)](https://git.cnct.io/common-tools/samsung-cnct_chart-technical-on-boarding/commits/master)
 ## Configuration
 
 The following tables lists the configurable parameters of the Technical On-boarding chart and their default values.
