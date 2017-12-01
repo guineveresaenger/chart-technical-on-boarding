@@ -1,11 +1,12 @@
-name: zabra # must match the artifact name & the subdirectory 'zabra' must also match)
+name: technical-on-boarding-chart
 version: ${CHART_VER}-${CHART_REL}
-description: Sample chart template for registry
+description: Technical On-boarding chart
 keywords:
 - kraken
-home: https://github.com/samsung-cnct/chart-zabra
+- on-boarding
+home: https://github.com/samsung-cnct/chart-technical-on-boarding
 sources:
-- https://github.com/samsung-cnct/chart-zabra
+- https://github.com/samsung-cnct/chart-technical-on-boarding
 maintainers:
 - name: Samsung CNCT
   email: samsung.cloudnative@gmail.com
