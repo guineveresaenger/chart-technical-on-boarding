@@ -77,13 +77,6 @@ publish-stable:
   script:
     - cd ${CHART_NAME} && helm registry push ${REGISTRY_CHART_URI} -c stable
 
-.generate_config_template:
-  script: &generate_config_script
-    - mkdir /root/.kube
-    - echo ${ENV_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
-    - helm init --client-only
-    - echo ${ENV_VALUES} | base64 -d > ${DEPLOY_VALUES}
-
 .config_artifacts_template:
   artifacts: &config_artifacts
     paths:
@@ -95,21 +88,23 @@ generate-staging-config:
   stage: config
   only:
     - master
-  variables:
-    ENV_KUBECONFIG: ${STAGING_KUBECONFIG}
-    ENV_VALUES: ${STAGING_VALUES}
   artifacts: *config_artifacts
-  script: *generate_config_script
+  script:
+    - mkdir /root/.kube
+    - echo ${STAGING_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
+    - helm init --client-only
+    - echo ${STAGING_VALUES} | base64 -d > ${DEPLOY_VALUES}
 
 generate-production-config:
   stage: config
   only:
     - /v[0-9]+\.[0-9]+\.[0-9]+/
-  variables:
-    ENV_KUBECONFIG: ${PRODUCTION_KUBECONFIG}
-    ENV_VALUES: ${PRODUCTION_VALUES}
   artifacts: *config_artifacts
-  script: *generate_config_script
+  script:
+    - mkdir /root/.kube
+    - echo ${PRODUCTION_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
+    - helm init --client-only
+    - echo ${PRODUCTION_VALUES} | base64 -d > ${DEPLOY_VALUES}
 
 validate-config:
   image: $KRAKEN_TOOLS
