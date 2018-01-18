@@ -58,7 +58,7 @@ test:
     RELEASE: ${CHART_NAME}-test-${CI_PIPELINE_ID}
     KUBECONFIG: ${DEPLOY_KUBECONFIG}
   before_script:
-    - mkdir /root/.kube
+    - mkdir ${CI_PROJECT_DIR}/deploy
     - echo ${TEST_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
     - helm init
   script:
@@ -91,7 +91,7 @@ generate-staging-config:
     - master
   artifacts: *config_artifacts
   script:
-    - mkdir /root/.kube
+    - mkdir ${CI_PROJECT_DIR}/deploy
     - echo ${STAGING_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
     - helm init --client-only
     - echo ${STAGING_VALUES} | base64 -d > ${DEPLOY_VALUES}
@@ -102,7 +102,7 @@ generate-production-config:
     - /v[0-9]+\.[0-9]+\.[0-9]+/
   artifacts: *config_artifacts
   script:
-    - mkdir /root/.kube
+    - mkdir ${CI_PROJECT_DIR}/deploy
     - echo ${PRODUCTION_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
     - helm init --client-only
     - echo ${PRODUCTION_VALUES} | base64 -d > ${DEPLOY_VALUES}
