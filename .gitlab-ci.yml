@@ -81,7 +81,6 @@ publish-stable:
   script: &generate_config_script
     - mkdir /root/.kube
     - echo ${ENV_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
-    - mkdir /root/.helm
     - helm init --client-only
     - echo ${ENV_VALUES} | base64 -d > ${DEPLOY_VALUES}
 
