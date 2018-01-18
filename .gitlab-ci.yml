@@ -57,9 +57,8 @@ test:
     NAMESPACE: ${CHART_NAME}-test
     RELEASE: ${CHART_NAME}-test-${CI_PIPELINE_ID}
   before_script:
-    - echo ${TEST_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
     - mkdir /root/.kube
-    - cp ${DEPLOY_KUBECONFIG} /root/.kube/config
+    - echo ${TEST_KUBECONFIG} | base64 -d > /root/.kube/config
     - helm init
   script:
     - build/test.sh
