@@ -56,10 +56,10 @@ test:
   variables:
     NAMESPACE: ${CHART_NAME}-test
     RELEASE: ${CHART_NAME}-test-${CI_PIPELINE_ID}
-    KUBECONFIG: ${DEPLOY_KUBECONFIG}
   before_script:
-    - mkdir ${CI_PROJECT_DIR}/deploy
     - echo ${TEST_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
+    - mkdir /root/.kube
+    - cp ${DEPLOY_KUBECONFIG} /root/.kube/config
     - helm init
   script:
     - build/test.sh
@@ -83,7 +83,7 @@ publish-stable:
     paths:
       - ${DEPLOY_KUBECONFIG}
       - ${DEPLOY_VALUES}
-    expire_in: 1 week
+    expire_in: 1 day
 
 generate-staging-config:
   stage: config
@@ -124,7 +124,9 @@ deploy-alpha-staging:
     - master
   variables:
     NAMESPACE: ${CHART_NAME}-staging
-    KUBECONFIG: ${DEPLOY_KUBECONFIG}
+  before_script:
+    - mkdir /root/.kube
+    - cp ${DEPLOY_KUBECONFIG} /root/.kube/config
   script:
     - cd ${CHART_NAME}
     - helm registry upgrade ${CHART_REGISTRY_URI}:alpha -- ${NAMESPACE} 
@@ -136,7 +138,9 @@ deploy-stable-production:
     - /v[0-9]+\.[0-9]+\.[0-9]+/
   variables:
     NAMESPACE: ${CHART_NAME}-production
-    KUBECONFIG: ${DEPLOY_KUBECONFIG}
+  before_script:
+    - mkdir /root/.kube
+    - cp ${DEPLOY_KUBECONFIG} /root/.kube/config
   script:
     - cd ${CHART_NAME}
     - helm registry upgrade ${CHART_REGISTRY_URI}:stable -- ${NAMESPACE} 
