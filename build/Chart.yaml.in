@@ -1,4 +1,4 @@
-name: technical-on-boarding-chart
+name: technical-on-boarding
 version: ${CHART_VER}-${CHART_REL}
 description: Technical On-boarding chart
 keywords:

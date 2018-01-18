@@ -2,17 +2,24 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
 spec:
   replicas: 1
   template:
     metadata:
+      name: {{ template "fullname" . }}
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "name" . }}
+        release: "{{ .Release.Name }}"
     spec:
       containers:
-      - image: {{.Values.image}}:{{.Values.tag}}
-        imagePullPolicy: Always
-        name: {{ template "fullname" . }}
+      - name: {{ template "fullname" . }}
+        image: "{{.Values.image}}:{{.Values.tag}}"
+        imagePullPolicy: "Always"
         ports:
         - containerPort: 9000
         readinessProbe:

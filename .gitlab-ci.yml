@@ -1,68 +1,146 @@
 image: $HELM_REGISTRY_IMAGE:$HELM_REGISTRY_VERSION
 
 variables:
-  REGISTRY: quay.io
-  REGISTRY_USER: your_org # we set this to override to samsung_cnct in gitlab Group Variables
-  CHART_NAME: technical-on-boarding-chart
+  CHART_NAME: technical-on-boarding
+  REGISTRY_HOST: quay.io
+  REGISTRY_ORG: samsung_cnct
+  REGISTRY_CHART_NAME: technical-on-boarding-chart
+  REGISTRY_CHART_URI: ${REGISTRY_HOST}/${REGISTRY_ORG}/${REGISTRY_CHART_NAME}
   ROBOT_ACCOUNT: technical_on_boarding_chart_rw
+  KRAKEN_TOOLS: quay.io/samsung_cnct/kraken-tools:latest
   HELM_REGISTRY_IMAGE: quay.io/samsung_cnct/helm-registry-agent
   HELM_REGISTRY_VERSION: v0.7.4-helm_2.6
 # Create a Gitlab Secret Variable called REGISTRY_PASSWORD and assign it the value of the registry robot docker login password.
 # DO NOT PASTE THIS PASSWORD HERE.
+  DEPLOY_KUBECONFIG: /root/.kube/config
+  DEPLOY_VALUES: /root/.helm/${CHART_NAME}-values.yaml
 
 stages:
   - build
   - test
   - publish
+  - config
+  - validate
+  - deploy
 
 before_script:
-  - helm registry login -u ${REGISTRY_USER}+${ROBOT_ACCOUNT} -p ${REGISTRY_PASSWORD} ${REGISTRY}
+  - helm registry login -u ${REGISTRY_ORG}+${ROBOT_ACCOUNT} -p ${REGISTRY_PASSWORD} ${REGISTRY_HOST}
 
-build_chart:
+build:
   stage: build
   only:
-    - tags
     - branches
   artifacts:
     paths:
-      - ${CHART_NAME}
+      - ${CHART_NAME}/Chart.yaml
+    expire_in: 1 week
   script:
     - build/build.sh
 
-helm_test:
-  stage: test
+build-tag:
+  stage: build
   only:
-    - tags
-    - branches
+    - /v[0-9]+\.[0-9]+\.[0-9]+/
+  artifacts:
+    paths:
+      - ${CHART_NAME}/Chart.yaml
+    expire_in: 1 week
+  variables:
+    CHART_VER: ${CI_COMMIT_TAG}
+    CHART_REL: 0
+  script:
+    - build/build.sh
+
+test:
+  stage: test
+  variables:
+    NAMESPACE: ${CHART_NAME}-test
+    RELEASE: ${CHART_NAME}-test-${CI_PIPELINE_ID}
+  before_script:
+    - mkdir /root/.kube
+    - echo ${TEST_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
+    - helm init
   script:
     - build/test.sh
 
-helm_publish_alpha:
+publish-alpha:
   stage: publish
   only:
     - master
   script:
-    - cd ${CHART_NAME} && helm registry push ${REGISTRY}/${REGISTRY_USER}/${CHART_NAME} -c alpha
+    - cd ${CHART_NAME} && helm registry push ${REGISTRY_CHART_URI} -c alpha
 
-helm_publish_tag:
+publish-stable:
   stage: publish
   only:
-    - /v[0-9]+\.[0-9]+(\.[0-9]+[a-z]?)?/
+    - /v[0-9]+\.[0-9]+\.[0-9]+/
   script:
-    - cd ${CHART_NAME} && helm registry push ${REGISTRY}/${REGISTRY_USER}/${CHART_NAME} -c stable
+    - cd ${CHART_NAME} && helm registry push ${REGISTRY_CHART_URI} -c stable
 
-# deploy-staging:
-#   stage: deploy
-#   only:
-#     - /v[0-9]+\.[0-9]+\.[0-9]+-[0-9]+/
-#   variables:
-#     CHART_REGISTRY_CHANNEL: prod
-#     NAMESPACE: ${APP_NAME}-staging
-#   before_script:
-#   - mkdir /root/.kube
-#   - echo ${STAGING_KUBECONFIG} | base64 -d > /root/.kube/config
-#   - helm init --client-only
-#   script:
-#   - cd ${APP_NAME}
-#   - export HELM_OPTS="--install --namespace ${NAMESPACE} --set victorops.apiKey=$STAGING_VICTOROPS_API_KEY"
-#   - helm registry upgrade ${CHART_REGISTRY_URI}:${CHART_REGISTRY_CHANNEL} -- ${NAMESPACE} ${HELM_OPTS}
+.generate_config_template:
+  script: &generate_config_script
+    - mkdir /root/.kube
+    - echo ${ENV_KUBECONFIG} | base64 -d > ${DEPLOY_KUBECONFIG}
+    - mkdir /root/.helm
+    - helm init --client-only
+    - echo ${ENV_VALUES} | base64 -d > ${DEPLOY_VALUES}
+
+.config_artifacts_template:
+  artifacts: &config_artifacts
+    paths:
+      - ${DEPLOY_KUBECONFIG}
+      - ${DEPLOY_VALUES}
+    expire_in: 1 week
+
+generate-staging-config:
+  stage: config
+  only:
+    - master
+  variables:
+    ENV_KUBECONFIG: ${STAGING_KUBECONFIG}
+    ENV_VALUES: ${STAGING_VALUES}
+  artifacts: *config_artifacts
+  script: *generate_config_script
+
+generate-production-config:
+  stage: config
+  only:
+    - /v[0-9]+\.[0-9]+\.[0-9]+/
+  variables:
+    ENV_KUBECONFIG: ${PRODUCTION_KUBECONFIG}
+    ENV_VALUES: ${PRODUCTION_VALUES}
+  artifacts: *config_artifacts
+  script: *generate_config_script
+
+validate-config:
+  image: $KRAKEN_TOOLS
+  stage: validate
+  only:
+    - master
+    - /v[0-9]+\.[0-9]+\.[0-9]+/
+  script:
+    - test -s ${DEPLOY_KUBECONFIG}
+    - kubectl --kubeconfig ${DEPLOY_KUBECONFIG} config view || exit $?
+    - test -f ${DEPLOY_VALUES}
+
+deploy-alpha-staging:
+  stage: deploy
+  only:
+    - master
+  variables:
+    NAMESPACE: ${CHART_NAME}-staging
+  script:
+    - cd ${CHART_NAME}
+    - helm registry upgrade ${CHART_REGISTRY_URI}:alpha -- ${NAMESPACE} 
+      --install --namespace ${NAMESPACE} --values ${DEPLOY_VALUES}
+
+deploy-stable-production:
+  stage: deploy
+  only:
+    - /v[0-9]+\.[0-9]+\.[0-9]+/
+  variables:
+    NAMESPACE: ${CHART_NAME}-production
+  script:
+    - cd ${CHART_NAME}
+    - helm registry upgrade ${CHART_REGISTRY_URI}:stable -- ${NAMESPACE} 
+      --install --namespace ${NAMESPACE} --values ${DEPLOY_VALUES}
