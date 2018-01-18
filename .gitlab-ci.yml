@@ -128,7 +128,7 @@ deploy-alpha-staging:
     - cp ${DEPLOY_KUBECONFIG} /root/.kube/config
   script:
     - cd ${CHART_NAME}
-    - helm registry upgrade ${CHART_REGISTRY_URI}:alpha -- ${NAMESPACE} 
+    - helm registry upgrade ${REGISTRY_CHART_URI}:alpha -- ${NAMESPACE}
       --install --namespace ${NAMESPACE} --values ${DEPLOY_VALUES}
 
 deploy-stable-production:
@@ -142,5 +142,5 @@ deploy-stable-production:
     - cp ${DEPLOY_KUBECONFIG} /root/.kube/config
   script:
     - cd ${CHART_NAME}
-    - helm registry upgrade ${CHART_REGISTRY_URI}:stable -- ${NAMESPACE} 
+    - helm registry upgrade ${REGISTRY_CHART_URI}:stable -- ${NAMESPACE}
       --install --namespace ${NAMESPACE} --values ${DEPLOY_VALUES}
