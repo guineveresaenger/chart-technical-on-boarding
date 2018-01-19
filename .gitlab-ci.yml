@@ -136,11 +136,12 @@ deploy-stable-production:
   only:
     - /v[0-9]+\.[0-9]+\.[0-9]+/
   variables:
-    NAMESPACE: ${CHART_NAME}-production
+    NAMESPACE: ${CHART_NAME}
   before_script:
     - mkdir /root/.kube
     - cp ${DEPLOY_KUBECONFIG} /root/.kube/config
   script:
     - cd ${CHART_NAME}
-    - helm registry upgrade ${REGISTRY_CHART_URI}:stable -- ${NAMESPACE}
+    - helm registry upgrade ${REGISTRY_CHART_URI}:stable
+      --tiller-namespace ${NAMESPACE} -- ${NAMESPACE}
       --install --namespace ${NAMESPACE} --values ${DEPLOY_VALUES}
