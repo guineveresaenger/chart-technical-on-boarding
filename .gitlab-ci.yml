@@ -142,6 +142,6 @@ deploy-stable-production:
     - cp ${DEPLOY_KUBECONFIG} /root/.kube/config
   script:
     - cd ${CHART_NAME}
-    - helm registry upgrade ${REGISTRY_CHART_URI}:stable
-      --tiller-namespace ${NAMESPACE} -- ${NAMESPACE}
-      --install --namespace ${NAMESPACE} --values ${DEPLOY_VALUES}
+    - helm registry upgrade ${REGISTRY_CHART_URI}:stable -- ${NAMESPACE}
+      --install --tiller-namespace ${NAMESPACE} --namespace ${NAMESPACE}
+      --values ${DEPLOY_VALUES}
