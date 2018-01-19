@@ -6,7 +6,7 @@
 name: technical-on-boarding
 image: quay.io/samsung_cnct/technical-on-boarding-container
 tag: latest
-host: technical-on-boarding.kubeme.io
+host: technical-on-boarding.cnct.io
 onboard:
   org: samsung-cnct
   repo: technical-on-boarding #home for new issues created
