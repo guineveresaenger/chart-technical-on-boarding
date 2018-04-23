@@ -49,10 +49,10 @@ It is possible that it may take a few moments for your ingress controller pod to
 5. Register your app with [GitHub OAuth](https://github.com/settings/applications/new) (more information [here](https://developer.github.com/v3/guides/basics-of-authentication/))
   - For the Application name, fill in anything you like that makes sense to you
   - The Homepage URL is the name of the GitHub repository your project boards will be created in.
-  - For the Authorization Callback URL, use `http://<your-DNS-name>/tracks`
+  - For the Authorization Callback URL, use the DNS name from Step 4: `http://<your_DNS_name>/tracks`
   - Once your application is registered, make a note of the `clientId` and `clientSecret`.
 7. Configure technical-on-boarding/values.yaml to reflect your particular setup. Change the following values:
-  - host: `<your-DNS-name>`
+  - host: `<your_DNS_name>`
   - onboard.org: `<your GitHub org name>`
   - onboard.repo: `<Github repository you created for the project boards>`
   - onboard.clientId: `<Github OAuth clientId from step 5>`
@@ -62,7 +62,7 @@ It is possible that it may take a few moments for your ingress controller pod to
 then
 `helm install ./technical-on-boarding` (this will install the chart on your cluster).
 Again, wait a few minutes for the pod to be ready. `kubectl get pods` will show readiness status.
-9. Go to http://`<your-DNS-name>` and follow the steps to create a new project. Each user visiting this site will be able to create their very own project board on your onboarding repo.
+9. Go to http://`<your_DNS_name>` and follow the steps to create a new project. Each user visiting this site will be able to create their very own project board on your onboarding repo.
 
 *Note*: This chart currently deploys a very specific container image, hosted by Samsung CNCT. It has several tracks designed for learning about Kubernetes, Kubernetes app development, and cluster operation. Should you wish to change those tracks or introduce your own, you will need to modify our [base container](https://github.com/samsung-cnct/container-technical-on-boarding) accordingly (instructions coming soon).
 
