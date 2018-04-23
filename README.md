@@ -21,11 +21,6 @@ Make sure you have installed [kubectl](https://kubernetes.io/docs/tasks/tools/in
 
 Make sure you have installed [helm](https://docs.helm.sh/using_helm/#installing-helm)
 
-#### Appr plugin
-
-Install appr (application registry) plugin according to instructions here: https://github.com/app-registry/appr#osx
-provides an nginx ingress controller chart on [Quay](http://quay.io) and you will need this plugin to be able to install charts on your Kubernetes cluster from a chart registry.
-
 #### A Kubernetes cluster
 
 You will need to have access to a working Kubernetes cluster with admin privilege (i.e. use GKE)
@@ -34,38 +29,42 @@ You will need to have access to a working Kubernetes cluster with admin privileg
 
 Create a GitHub repository where your onboarding projects will be created.
 Enable Issues on that repo (Settings --> check Issues)
+All persons who will be assigned projects must have write access to this repository.
+
+#### A DNS hostname for your application homepage
+
+This will be the name of the website where the onboarding app will run and your users can have their project board created.
 
 ### Set up and deploy your chart
 
-1. On your cluster, run `helm init`(this will deploy tiller)
-2. Your cluster will need an ingress controller to be able to expose the app running on your cluster to the outside. Deploy the following helm chart like so:
-`helm registry install quay.io/samsung_cnct/nginx-ingress`
-3. Find the ingress controller's external IP address by querying your cluster:
+1. On your cluster, run `helm init`(this will deploy tiller). Make sure tiller is configured to have cluster-wide permissions.
+2. Register your app with [GitHub OAuth](https://github.com/settings/applications/new) (more information [here](https://developer.github.com/v3/guides/basics-of-authentication/))
+  - For the Application name, fill in anything you like that makes sense to you
+  - The Homepage URL is the name of the GitHub repository your project boards will be created in. You may choose any repository you like; all persons who will be assigned projects must have write access to this repository.
+  - For the Authorization Callback URL, use the DNS name for your application homepage: `http://<your_DNS_name>/tracks`
+  - Once your application is registered, make a note of the `clientId` and `clientSecret`.
+3. Configure technical-on-boarding/values.yaml to reflect your particular setup. Change the following values:
+  - host: `<your_DNS_name>`
+  - onboard.org: `<your GitHub org name>`
+  - onboard.repo: `<Github repository you created for the project boards>`
+  - onboard.clientId: `<Github OAuth clientId from step 2>`
+  - onboard.clientSecret `<Github OAuth clientSecret from step 2>`
+4. In your cloned folder for the helm chart, run
+` build/build.sh` (this will generate a Chart.yaml)
+then
+`helm install ./technical-on-boarding` (this will install the chart on your cluster).
+Wait a few minutes for the pod to be ready. `kubectl get pods` will show readiness status.
+5. Your cluster will need an ingress controller to be able to expose the app running on your cluster to the outside. Deploy the following helm chart like so:
+`helm install stable/nginx-ingress`
+6. Find the ingress controller's external IP address by querying your cluster:
 `kubectl get services -o wide`
 You should see a Service of Type LoadBalancer that has an external IP address. Make a note of this address.
 It is possible that it may take a few moments for your ingress controller pod to spin up; you can run
 `kubectl get pods` and that should tell you the status of your pod.
-4. Create a DNS record that resolves to the IP address from Step 3 (i.e. with AWS Route 53)
-5. Register your app with [GitHub OAuth](https://github.com/settings/applications/new) (more information [here](https://developer.github.com/v3/guides/basics-of-authentication/))
-  - For the Application name, fill in anything you like that makes sense to you
-  - The Homepage URL is the name of the GitHub repository your project boards will be created in.
-  - For the Authorization Callback URL, use the DNS name from Step 4: `http://<your_DNS_name>/tracks`
-  - Once your application is registered, make a note of the `clientId` and `clientSecret`.
-7. Configure technical-on-boarding/values.yaml to reflect your particular setup. Change the following values:
-  - host: `<your_DNS_name>`
-  - onboard.org: `<your GitHub org name>`
-  - onboard.repo: `<Github repository you created for the project boards>`
-  - onboard.clientId: `<Github OAuth clientId from step 5>`
-  - onboard.clientSecret `<Github OAuth clientSecret from step 5>`
-8. In your cloned folder for the helm chart, run
-` build/build.sh` (this will generate a Chart.yaml)
-then
-`helm install ./technical-on-boarding` (this will install the chart on your cluster).
-Again, wait a few minutes for the pod to be ready. `kubectl get pods` will show readiness status.
-9. Go to http://`<your_DNS_name>` and follow the steps to create a new project. Each user visiting this site will be able to create their very own project board on your onboarding repo.
+7. Resolve your DNS record to the IP address from Step 6.
+8. Go to http://`<your_DNS_name>` and follow the steps to create a new project. Each user visiting this site will be able to create their very own project board on your onboarding repo.
 
 *Note*: This chart currently deploys a very specific container image, hosted by Samsung CNCT. It has several tracks designed for learning about Kubernetes, Kubernetes app development, and cluster operation. Should you wish to change those tracks or introduce your own, you will need to modify our [base container](https://github.com/samsung-cnct/container-technical-on-boarding) accordingly (instructions coming soon).
-
 
 ## Configuration
 
