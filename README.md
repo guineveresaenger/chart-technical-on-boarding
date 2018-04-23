@@ -52,17 +52,17 @@ It is possible that it may take a few moments for your ingress controller pod to
   - For the Authorization Callback URL, use `http://<your-DNS-name>/tracks`
   - Once your application is registered, make a note of the `clientId` and `clientSecret`.
 7. Configure technical-on-boarding/values.yaml to reflect your particular setup. Change the following values:
-  - host: <your-DNS-name>
-  - onboard.org: <your GitHub org name>
-  - onboard.repo: <Github repository you created for the project boards>
-  - onboard.clientId: <Github OAuth clientId from step 5>
-  - onboard.clientSecret <Github OAuth clientSecret from step 5>
+  - host: `<your-DNS-name>`
+  - onboard.org: `<your GitHub org name>`
+  - onboard.repo: `<Github repository you created for the project boards>`
+  - onboard.clientId: `<Github OAuth clientId from step 5>`
+  - onboard.clientSecret `<Github OAuth clientSecret from step 5>`
 8. In your cloned folder for the helm chart, run
 ` build/build.sh` (this will generate a Chart.yaml)
 then
 `helm install ./technical-on-boarding` (this will install the chart on your cluster).
 Again, wait a few minutes for the pod to be ready. `kubectl get pods` will show readiness status.
-9. Go to http://<your-DNS-name> and follow the steps to create a new project. Each user visiting this site will be able to create their very own project board on your onboarding repo.
+9. Go to http://`<your-DNS-name>` and follow the steps to create a new project. Each user visiting this site will be able to create their very own project board on your onboarding repo.
 
 *Note*: This chart currently deploys a very specific container image, hosted by Samsung CNCT. It has several tracks designed for learning about Kubernetes, Kubernetes app development, and cluster operation. Should you wish to change those tracks or introduce your own, you will need to modify our [base container](https://github.com/samsung-cnct/container-technical-on-boarding) accordingly (instructions coming soon).
 
@@ -81,6 +81,8 @@ The following tables lists the configurable parameters of the Technical On-board
 | `onboard.clientSecret`   | github client secret                            |  **Required**                                          |
 
 ### GitLab Configuration
+
+*(For CNCT development purposes only)*
 
 The following project level [GitLab secret variable](https://git.cnct.io/help/ci/variables/README.md#secret-variables)
 is required:
