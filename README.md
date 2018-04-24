@@ -64,7 +64,12 @@ then
 Again, wait a few minutes for the pod to be ready. `kubectl get pods` will show readiness status.
 9. Go to http://`<your_DNS_name>` and follow the steps to create a new project. Each user visiting this site will be able to create their very own project board on your onboarding repo.
 
-*Note*: This chart currently deploys a very specific container image, hosted by Samsung CNCT. It has several tracks designed for learning about Kubernetes, Kubernetes app development, and cluster operation. Should you wish to change those tracks or introduce your own, you will need to modify our [base container](https://github.com/samsung-cnct/container-technical-on-boarding) accordingly (instructions coming soon).
+#### Custom task board
+
+*Note*: This chart currently deploys a very specific container image, hosted by Samsung CNCT. It has several tracks designed for learning about Kubernetes, Kubernetes app development, and cluster operation. Should you wish to change those tracks or introduce your own, you will need to modify our [base container](https://github.com/samsung-cnct/container-technical-on-boarding) accordingly:
+1. Follow [instructions](https://github.com/samsung-cnct/container-technical-on-boarding/README.md#modifying-task-lists) to create and host a custom container image.
+2. In `technical-on-boarding/values.yaml`, change the `image` field to the address of that image in your container registry. Change the `tag` field if applicable. Follow the [above steps](#setup-and-deploy-your-chart) as before.
+
 
 
 ## Configuration
