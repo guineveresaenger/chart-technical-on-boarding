@@ -55,7 +55,8 @@ then
 `helm install ./technical-on-boarding` (this will install the chart on your cluster).
 Wait a few minutes for the pod to be ready. `kubectl get pods` will show readiness status.
 5. Your cluster will need an ingress controller to be able to expose the app running on your cluster to the outside. Deploy the following helm chart like so:
-`helm install stable/nginx-ingress`
+`helm install stable/nginx-ingress --set rbac.create=true`
+*Note: Since all Kubernetes clusters > v.1.8 come with role-based access control enabled, setting `rbac.create` to true is a necessity for the ingress controller pod to start correctly.*
 6. Find the ingress controller's external IP address by querying your cluster:
 `kubectl get services -o wide`
 You should see a Service of Type LoadBalancer that has an external IP address. Make a note of this address.
